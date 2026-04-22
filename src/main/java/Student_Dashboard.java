@@ -7,98 +7,138 @@
  *
  * @author Mostafa
  */
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import java.sql.*;
+
 public class Student_Dashboard extends javax.swing.JFrame {
-    
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Student_Dashboard.class.getName());
-    
-    // ✅ أضف المتغيرات هنا
+
+    private static final java.util.logging.Logger logger =
+            java.util.logging.Logger.getLogger(Student_Dashboard.class.getName());
+
     private int studentId;
     private String studentName;
-    
-    /**
-     * Creates new form Student_Dashboard
-     */
-    // ✅ استبدل الـ Constructor القديم بالجديد
+
+    // ✅ Constructor افتراضي (مهم لـ NetBeans)
+    public Student_Dashboard() {
+        initComponents();
+        this.studentId = 0;
+        this.studentName = "";
+    }
+
+    // ✅ Constructor الأساسي
     public Student_Dashboard(int studentId, String studentName) {
         initComponents();
         this.studentId = studentId;
         this.studentName = studentName;
+
         loadHomeData();
         loadCourses();
         loadMyCourses();
         loadProfile();
-        private void loadHomeData() {
-    lblWelcome.setText("Welcome, " + studentName + "!");
-    try {
-        java.sql.ResultSet rs = db.DBConnection.getConnection()
-            .createStatement().executeQuery("SELECT COUNT(*) FROM courses");
-        if (rs.next()) lblTotalCourses.setText(String.valueOf(rs.getInt(1)));
+    }
 
-        java.sql.PreparedStatement stmt = db.DBConnection.getConnection().prepareStatement(
-            "SELECT COUNT(*) FROM enrollments WHERE student_id=?"
-        );
-        stmt.setInt(1, studentId);
-        java.sql.ResultSet rs2 = stmt.executeQuery();
-        if (rs2.next()) lblMyCourses.setText(String.valueOf(rs2.getInt(1)));
+    // ===================== LOAD METHODS =====================
 
-    } catch (java.sql.SQLException e) { e.printStackTrace(); }
-}
+    private void loadHomeData() {
+        lblWelcome.setText("Welcome, " + studentName + "!");
 
-private void loadCourses() {
-    javax.swing.table.DefaultTableModel model =
-        (javax.swing.table.DefaultTableModel) tblCourses.getModel();
-    model.setRowCount(0);
-    try {
-        java.sql.ResultSet rs = db.DBConnection.getConnection()
-            .createStatement().executeQuery("SELECT * FROM courses");
-        while (rs.next()) {
-            model.addRow(new Object[]{
-                rs.getInt("id"),
-                rs.getString("name"),
-                rs.getString("description"),
-                rs.getString("instructor")
-            });
+        try {
+            ResultSet rs = db.DBConnection.getConnection()
+                    .createStatement()
+                    .executeQuery("SELECT COUNT(*) FROM courses");
+
+            if (rs.next())
+                lblTotalCourses.setText(String.valueOf(rs.getInt(1)));
+
+            PreparedStatement stmt = db.DBConnection.getConnection()
+                    .prepareStatement("SELECT COUNT(*) FROM enrollments WHERE student_id=?");
+
+            stmt.setInt(1, studentId);
+            ResultSet rs2 = stmt.executeQuery();
+
+            if (rs2.next())
+                lblMyCourses.setText(String.valueOf(rs2.getInt(1)));
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (java.sql.SQLException e) { e.printStackTrace(); }
-}
+    }
 
-private void loadMyCourses() {
-    javax.swing.table.DefaultTableModel model =
-        (javax.swing.table.DefaultTableModel) tblMyCourses.getModel();
-    model.setRowCount(0);
-    try {
-        java.sql.PreparedStatement stmt = db.DBConnection.getConnection().prepareStatement(
-            "SELECT c.id, c.name, c.instructor, e.enrolled_at " +
-            "FROM courses c JOIN enrollments e ON c.id=e.course_id " +
-            "WHERE e.student_id=?"
-        );
-        stmt.setInt(1, studentId);
-        java.sql.ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            model.addRow(new Object[]{
-                rs.getInt("id"),
-                rs.getString("name"),
-                rs.getString("instructor"),
-                rs.getTimestamp("enrolled_at")
-            });
-        }
-    } catch (java.sql.SQLException e) { e.printStackTrace(); }
-}
+    private void loadCourses() {
+        DefaultTableModel model =
+                (DefaultTableModel) tblCourses.getModel();
 
-private void loadProfile() {
-    try {
-        java.sql.PreparedStatement stmt = db.DBConnection.getConnection().prepareStatement(
-            "SELECT * FROM students WHERE id=?"
-        );
-        stmt.setInt(1, studentId);
-        java.sql.ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
-            txtProfileName.setText(rs.getString("full_name"));
-            txtProfileEmail.setText(rs.getString("email"));
-            txtProfilePhone.setText(rs.getString("phone"));
+        model.setRowCount(0);
+
+        try {
+            ResultSet rs = db.DBConnection.getConnection()
+                    .createStatement()
+                    .executeQuery("SELECT * FROM courses");
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getString("instructor")
+                });
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (java.sql.SQLException e) { e.printStackTrace(); }
-}
+    }
+
+    private void loadMyCourses() {
+        DefaultTableModel model =
+                (DefaultTableModel) tblMyCourses.getModel();
+
+        model.setRowCount(0);
+
+        try {
+            PreparedStatement stmt = db.DBConnection.getConnection()
+                    .prepareStatement(
+                            "SELECT c.id, c.name, c.instructor, e.enrolled_at " +
+                                    "FROM courses c JOIN enrollments e ON c.id=e.course_id " +
+                                    "WHERE e.student_id=?"
+                    );
+
+            stmt.setInt(1, studentId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("instructor"),
+                        rs.getTimestamp("enrolled_at")
+                });
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadProfile() {
+        try {
+            PreparedStatement stmt = db.DBConnection.getConnection()
+                    .prepareStatement("SELECT * FROM students WHERE id=?");
+
+            stmt.setInt(1, studentId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                txtProfileName.setText(rs.getString("full_name"));
+                txtProfileEmail.setText(rs.getString("email"));
+                txtProfilePhone.setText(rs.getString("phone"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -112,7 +152,7 @@ private void loadProfile() {
 
         Home = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        lblWelcome = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         lblTotalCourses = new javax.swing.JLabel();
@@ -122,17 +162,17 @@ private void loadProfile() {
         jLabel4 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
-        textSearchCourse = new javax.swing.JTextField();
+        txtSearchCourse = new javax.swing.JTextField();
         btnSearch = new javax.swing.JButton();
         btnEnroll = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblCourses = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
-        btnEnroll1 = new javax.swing.JButton();
+        btnUnenroll = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         jScrollPane4 = new javax.swing.JScrollPane();
-        tblCourses1 = new javax.swing.JTable();
+        tblMyCourses = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         txtProfileName = new javax.swing.JTextField();
@@ -147,7 +187,7 @@ private void loadProfile() {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setText("Welcome ");
+        lblWelcome.setText("Welcome ");
 
         jPanel6.setBackground(new java.awt.Color(51, 158, 225));
 
@@ -212,7 +252,7 @@ private void loadProfile() {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(27, 27, 27)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(lblWelcome, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -227,7 +267,7 @@ private void loadProfile() {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(18, 18, 18)
-                .addComponent(jLabel1)
+                .addComponent(lblWelcome)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -278,7 +318,7 @@ private void loadProfile() {
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(textSearchCourse, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtSearchCourse, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(btnSearch)))))
                 .addContainerGap(98, Short.MAX_VALUE))
@@ -289,7 +329,7 @@ private void loadProfile() {
                 .addGap(30, 30, 30)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(textSearchCourse, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtSearchCourse, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnSearch))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -300,10 +340,10 @@ private void loadProfile() {
 
         Home.addTab("Available Courses", jPanel2);
 
-        btnEnroll1.setText("UnEnroll ");
-        btnEnroll1.addActionListener(this::btnEnroll1ActionPerformed);
+        btnUnenroll.setText("UnEnroll ");
+        btnUnenroll.addActionListener(this::btnUnenrollActionPerformed);
 
-        tblCourses1.setModel(new javax.swing.table.DefaultTableModel(
+        tblMyCourses.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -316,7 +356,7 @@ private void loadProfile() {
                 "ID", "Cource Name", "Instructor", "Enrolled"
             }
         ));
-        jScrollPane4.setViewportView(tblCourses1);
+        jScrollPane4.setViewportView(tblMyCourses);
 
         jScrollPane3.setViewportView(jScrollPane4);
 
@@ -331,7 +371,7 @@ private void loadProfile() {
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 485, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(131, 131, 131)
-                        .addComponent(btnEnroll1, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnUnenroll, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(56, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -340,7 +380,7 @@ private void loadProfile() {
                 .addGap(26, 26, 26)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btnEnroll1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnUnenroll, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(38, Short.MAX_VALUE))
         );
 
@@ -458,7 +498,7 @@ private void loadProfile() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
-  private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {
+  
     String keyword = txtSearchCourse.getText().trim();
     javax.swing.table.DefaultTableModel model =
         (javax.swing.table.DefaultTableModel) tblCourses.getModel();
@@ -479,117 +519,89 @@ private void loadProfile() {
             });
         }
     } catch (java.sql.SQLException e) { e.printStackTrace(); }
-}        // TODO add your handling code here:
+        // TODO add your handling code here:
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void btnEnrollActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnrollActionPerformed
-private void btnEnrollActionPerformed(java.awt.event.ActionEvent evt) {
-    int row = tblCourses.getSelectedRow();
-    if (row == -1) {
-        JOptionPane.showMessageDialog(this, "Please select a course first!");
-        return;
-    }
-
-    int courseId = (int) tblCourses.getValueAt(row, 0);
-    String courseName = (String) tblCourses.getValueAt(row, 1);
-
-    try {
-        java.sql.PreparedStatement stmt = db.DBConnection.getConnection().prepareStatement(
-            "INSERT INTO enrollments (student_id, course_id) VALUES (?,?)"
-        );
-        stmt.setInt(1, studentId);
-        stmt.setInt(2, courseId);
-        stmt.executeUpdate();
-
-        JOptionPane.showMessageDialog(this, "Successfully enrolled in " + courseName + "!");
-        loadMyCourses();
-        loadHomeData();
-
-    } catch (java.sql.SQLException e) {
-        if (e.getMessage().contains("Duplicate")) {
-            JOptionPane.showMessageDialog(this, "You are already enrolled in this course!");
-        } else {
-            e.printStackTrace();
-        }
-    }
-}
         // TODO add your handling code here:
+            int row = tblCourses.getSelectedRow();
+            if (row == -1) { JOptionPane.showMessageDialog(this, "Please select a course first!"); return; }
+
+            int courseId = (int) tblCourses.getValueAt(row, 0);
+            String courseName = (String) tblCourses.getValueAt(row, 1);
+
+            try {
+                java.sql.PreparedStatement stmt = db.DBConnection.getConnection().prepareStatement(
+                    "INSERT INTO enrollments (student_id, course_id) VALUES (?,?)"
+                );
+                stmt.setInt(1, studentId); stmt.setInt(2, courseId);
+                stmt.executeUpdate();
+                JOptionPane.showMessageDialog(this, "Successfully enrolled in " + courseName + "!");
+                loadMyCourses(); loadHomeData();
+            } catch (java.sql.SQLException e) {
+                if (e.getMessage().contains("Duplicate"))
+                    JOptionPane.showMessageDialog(this, "Already enrolled in this course!");
+                else e.printStackTrace();
+            }
     }//GEN-LAST:event_btnEnrollActionPerformed
 
-    private void btnEnroll1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnroll1ActionPerformed
-private void btnUnenrollActionPerformed(java.awt.event.ActionEvent evt) {
-    int row = tblMyCourses.getSelectedRow();
-    if (row == -1) {
-        JOptionPane.showMessageDialog(this, "Please select a course first!");
-        return;
-    }
+    private void btnUnenrollActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUnenrollActionPerformed
+        // TODO add your handling code here:
+            int row = tblMyCourses.getSelectedRow();
+            if (row == -1) { JOptionPane.showMessageDialog(this, "Please select a course first!"); return; }
 
-    int courseId = (int) tblMyCourses.getValueAt(row, 0);
+            int courseId = (int) tblMyCourses.getValueAt(row, 0);
+            String courseName = (String) tblMyCourses.getValueAt(row, 1);
 
-    int confirm = JOptionPane.showConfirmDialog(this,
-        "Are you sure you want to unenroll?", "Confirm", JOptionPane.YES_NO_OPTION);
-
-    if (confirm == JOptionPane.YES_OPTION) {
-        try {
-            java.sql.PreparedStatement stmt = db.DBConnection.getConnection().prepareStatement(
-                "DELETE FROM enrollments WHERE student_id=? AND course_id=?"
-            );
-            stmt.setInt(1, studentId);
-            stmt.setInt(2, courseId);
-            stmt.executeUpdate();
-
-            JOptionPane.showMessageDialog(this, "Unenrolled successfully!");
-            loadMyCourses();
-            loadHomeData();
-
-        } catch (java.sql.SQLException e) { e.printStackTrace(); }
-    }
-}
-// TODO add your handling code here:
-    }//GEN-LAST:event_btnEnroll1ActionPerformed
+            int confirm = JOptionPane.showConfirmDialog(this,
+                "Unenroll from " + courseName + "?", "Confirm", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                try {
+                    java.sql.PreparedStatement stmt = db.DBConnection.getConnection().prepareStatement(
+                        "DELETE FROM enrollments WHERE student_id=? AND course_id=?"
+                    );
+                    stmt.setInt(1, studentId); stmt.setInt(2, courseId);
+                    stmt.executeUpdate();
+                    JOptionPane.showMessageDialog(this, "Unenrolled successfully!");
+                    loadMyCourses(); loadHomeData();
+                } catch (java.sql.SQLException e) { e.printStackTrace(); }
+            }
+    }//GEN-LAST:event_btnUnenrollActionPerformed
 
     private void txtProfilePhoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtProfilePhoneActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtProfilePhoneActionPerformed
 
     private void btnSaveProfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveProfileActionPerformed
-private void btnSaveProfileActionPerformed(java.awt.event.ActionEvent evt) {
-    String name  = txtProfileName.getText().trim();
-    String email = txtProfileEmail.getText().trim();
-    String phone = txtProfilePhone.getText().trim();
+        // TODO add your handling code here:
+        String name  = txtProfileName.getText().trim();
+        String email = txtProfileEmail.getText().trim();
+        String phone = txtProfilePhone.getText().trim();
 
-    if (name.isEmpty() || email.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Name and Email cannot be empty!");
-        return;
-    }
-
-    try {
-        java.sql.PreparedStatement stmt = db.DBConnection.getConnection().prepareStatement(
-            "UPDATE students SET full_name=?, email=?, phone=? WHERE id=?"
-        );
-        stmt.setString(1, name);
-        stmt.setString(2, email);
-        stmt.setString(3, phone);
-        stmt.setInt(4, studentId);
-        stmt.executeUpdate();
-
-        JOptionPane.showMessageDialog(this, "Profile updated successfully!");
-
-    } catch (java.sql.SQLException e) { e.printStackTrace(); }
-}
-// TODO add your handling code here:
+        if (name.isEmpty() || email.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Name and Email cannot be empty!"); return;
+        }
+        try {
+            java.sql.PreparedStatement stmt = db.DBConnection.getConnection().prepareStatement(
+                "UPDATE students SET email=?, phone=? WHERE id=?"
+            );
+            stmt.setString(1, email); stmt.setString(2, phone); stmt.setInt(3, studentId);
+            stmt.executeUpdate();
+            JOptionPane.showMessageDialog(this, "Profile updated successfully!");
+        }
+        catch (java.sql.SQLException e) { e.printStackTrace(); 
+        }
+    
     }//GEN-LAST:event_btnSaveProfileActionPerformed
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
-private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {
-    int confirm = JOptionPane.showConfirmDialog(this,
-        "Are you sure you want to logout?", "Logout", JOptionPane.YES_NO_OPTION);
-    if (confirm == JOptionPane.YES_OPTION) {
-        new LoginForm().setVisible(true);
-        this.dispose();
-    }
-}
-// TODO add your handling code here:
+        // TODO add your handling code here:
+            int confirm = JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to logout?", "Logout", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                new LoginForm().setVisible(true);
+                this.dispose();
+            }
     }//GEN-LAST:event_btnLogoutActionPerformed
 
     /**
@@ -614,17 +626,19 @@ private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new Student_Dashboard().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> {
+            new Student_Dashboard(1, "Test Student").setVisible(true);
+        });
     }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane Home;
     private javax.swing.JButton btnEnroll;
-    private javax.swing.JButton btnEnroll1;
     private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnSaveProfile;
     private javax.swing.JButton btnSearch;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton btnUnenroll;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -646,11 +660,12 @@ private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JLabel lblMyCourses;
     private javax.swing.JLabel lblTotalCourses;
+    private javax.swing.JLabel lblWelcome;
     private javax.swing.JTable tblCourses;
-    private javax.swing.JTable tblCourses1;
-    private javax.swing.JTextField textSearchCourse;
+    private javax.swing.JTable tblMyCourses;
     private javax.swing.JTextField txtProfileEmail;
     private javax.swing.JTextField txtProfileName;
     private javax.swing.JTextField txtProfilePhone;
+    private javax.swing.JTextField txtSearchCourse;
     // End of variables declaration//GEN-END:variables
 }
