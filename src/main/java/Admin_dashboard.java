@@ -110,7 +110,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
+        lblStudentCount = new javax.swing.JLabel();
         jPanel10 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         lblCourseCount = new javax.swing.JLabel();
@@ -176,7 +176,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
 
         jLabel2.setText("Total Students");
 
-        jLabel5.setText("num of student");
+        lblStudentCount.setText("num of student");
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
@@ -189,7 +189,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel8Layout.createSequentialGroup()
                         .addGap(36, 36, 36)
-                        .addComponent(jLabel5)))
+                        .addComponent(lblStudentCount)))
                 .addContainerGap(25, Short.MAX_VALUE))
         );
         jPanel8Layout.setVerticalGroup(
@@ -198,7 +198,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
                 .addGap(29, 29, 29)
                 .addComponent(jLabel2)
                 .addGap(28, 28, 28)
-                .addComponent(jLabel5)
+                .addComponent(lblStudentCount)
                 .addContainerGap(42, Short.MAX_VALUE))
         );
 
@@ -1074,7 +1074,6 @@ public class Admin_dashboard extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
@@ -1097,6 +1096,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblCourseCount;
     private javax.swing.JLabel lblEnrollCount;
+    private javax.swing.JLabel lblStudentCount;
     private javax.swing.JTable tblCourses;
     private javax.swing.JTable tblEnrollments;
     private javax.swing.JTable tblStudents;
