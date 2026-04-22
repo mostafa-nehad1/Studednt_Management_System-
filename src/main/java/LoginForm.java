@@ -387,9 +387,9 @@ public class LoginForm extends javax.swing.JFrame {
 
              if (studentRs.next()) {
                   int id = studentRs.getInt("id");
-                  String name = studentRs.getString("full_name");
-                  JOptionPane.showMessageDialog(this, "Welcome " + name + "!");
-                  new Student_Dashboard(id, name).setVisible(true);
+                  String fname = studentRs.getString("first_name");
+                  JOptionPane.showMessageDialog(this, "Welcome " + fname + "!");
+                  new Student_Dashboard(id, fname).setVisible(true);
                   this.dispose();
             } else {
                   JOptionPane.showMessageDialog(this, "Wrong username or password!",
@@ -412,53 +412,67 @@ public class LoginForm extends javax.swing.JFrame {
     }//GEN-LAST:event_rbFemaleActionPerformed
 
     private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterActionPerformed
-        // TODO add your handling code here:
-        String name = txtFirstName.getText().trim() + " " + txtLastName.getText().trim();
-        String email   = txtEmail.getText().trim();
-        String phone   = txtPhone.getText().trim();
-        String pass = new String(txtRegPassword.getPassword()).trim();
-        String confirm = new String(txtConfirmPassword.getPassword()).trim();
+// 1. سحب كل البيانات من الواجهة
+    String fName = txtFirstName.getText().trim();
+    String lName = txtLastName.getText().trim();
+    String ageStr = txtAge.getText().trim(); // خانة العمر
+    String email = txtEmail.getText().trim();
+    String username = txtRegUsername.getText().trim();
+    String phone = txtPhone.getText().trim();
+    String address = txtAddress.getText().trim(); // خانة العنوان
+    String pass = new String(txtRegPassword.getPassword()).trim();
+    String confirm = new String(txtConfirmPassword.getPassword()).trim();
+    
+    // تحديد النوع (Gender)
+    String gender = rbMale.isSelected() ? "Male" : (rbFemale.isSelected() ? "Female" : "");
 
-         if (name.isEmpty() || email.isEmpty() || pass.isEmpty()) {
-           JOptionPane.showMessageDialog(this, "Please fill all required fields!");
-             return;
-            }
-         if (!pass.equals(confirm)) {
-             JOptionPane.showMessageDialog(this, "Passwords do not match!");
-                 return;
-            }
-         if (!email.contains("@")) {
-             JOptionPane.showMessageDialog(this, "Invalid email address!");
-                 return;
-                 }
-
-        try {
-              java.sql.PreparedStatement stmt = db.DBConnection.getConnection().prepareStatement(
-                    "INSERT INTO students (full_name, email, username, password, phone) VALUES (?,?,?,?,?)"                 );
-              stmt.setString(1, name);
-              stmt.setString(2, email);
-              stmt.setString(3, txtRegUsername.getText().trim());
-              stmt.setString(4, hashMD5(pass));
-              stmt.setString(5, phone);
-              stmt.executeUpdate();
-
-           JOptionPane.showMessageDialog(this, "Registration successful! You can now login.");
-                // clear fields
-            txtFirstName.setText("");
-            txtLastName.setText("");
-            txtEmail.setText("");
-            txtPhone.setText("");
-            txtRegPassword.setText("");
-            txtConfirmPassword.setText("");
-            jTabbedPane1.setSelectedIndex(0);
-
-         } catch (java.sql.SQLException e) {
-            if (e.getMessage().contains("Duplicate")) {
-                JOptionPane.showMessageDialog(this, "Email already registered!");
-        } else {
-                e.printStackTrace();
-           }
+    // 2. التحقق من ملء البيانات الأساسية
+    if (fName.isEmpty() || lName.isEmpty() || ageStr.isEmpty() || email.isEmpty() || username.isEmpty() || pass.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please fill all fields (Name, Age, Email, etc.)");
+        return;
     }
+
+    // التأكد إن السن رقم مش حروف
+    int age;
+    try {
+        age = Integer.parseInt(ageStr);
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Please enter a valid number for Age!");
+        return;
+    }
+
+    if (!pass.equals(confirm)) {
+        JOptionPane.showMessageDialog(this, "Passwords do not match!");
+        return;
+    }
+
+    try {
+        // 3. جملة SQL شاملة لكل العواميد اللي في جدولك
+        String sql = "INSERT INTO students (first_name, last_name, age, email, phone, address, gender, username, password) VALUES (?,?,?,?,?,?,?,?,?)";
+        java.sql.PreparedStatement stmt = db.DBConnection.getConnection().prepareStatement(sql);
+        
+        stmt.setString(1, fName);
+        stmt.setString(2, lName);
+        stmt.setInt(3, age);      // إرسال العمر كـ Integer
+        stmt.setString(4, email);
+        stmt.setString(5, phone);
+        stmt.setString(6, address);
+        stmt.setString(7, gender);
+        stmt.setString(8, username);
+        stmt.setString(9, hashMD5(pass));
+        
+        stmt.executeUpdate();
+
+        JOptionPane.showMessageDialog(this, "Registration successful!");
+        
+        // رجوع لشاشة الدخول وتصفير الخانات
+        btnBackActionPerformed(null); 
+
+    } catch (java.sql.SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage());
+    }
+    
     }//GEN-LAST:event_btnRegisterActionPerformed
 
     private void btnGoRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGoRegisterActionPerformed

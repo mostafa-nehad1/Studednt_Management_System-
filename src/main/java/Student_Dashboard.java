@@ -131,7 +131,9 @@ public class Student_Dashboard extends javax.swing.JFrame {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                txtProfileName.setText(rs.getString("full_name"));
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
+                txtProfileName.setText(firstName + " " + lastName);
                 txtProfileEmail.setText(rs.getString("email"));
                 txtProfilePhone.setText(rs.getString("phone"));
             }

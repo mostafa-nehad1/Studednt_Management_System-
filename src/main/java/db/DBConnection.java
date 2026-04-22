@@ -12,10 +12,10 @@ public class DBConnection {
 
     // 🔴 Change these to match your SQL Server setup
     private static final String URL =
-            "jdbc:sqlserver://localhost:1433;databaseName=StudentManagement;encrypt=true;trustServerCertificate=true";
+            "jdbc:sqlserver://localhost:1433;databaseName=StudentManagement;encrypt=false;trustServerCertificate=true;";
 
     private static final String USER = "sa";        // your SQL username
-    private static final String PASSWORD = "your_password_here"; // your SQL password
+    private static final String PASSWORD = "12345678"; // your SQL password
 
     private static Connection connection;
 
