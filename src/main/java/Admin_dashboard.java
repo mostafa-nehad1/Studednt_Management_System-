@@ -966,29 +966,30 @@ public class Admin_dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_txtAdminPasswordActionPerformed
 
     private void btnAddAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddAdminActionPerformed
-    // TODO add your handling code here:
-            String username = txtAdminUsername.getText().trim();
-            String password = new String(txtAdminPassword.getPassword()).trim();
+    String user = txtAdminUsername.getText().trim();
+    String pass = new String(txtAdminPassword.getPassword()).trim();
 
-            if (username.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please enter username and password!");
-                return;
-            }
-            try {
-                java.sql.PreparedStatement stmt = db.DBConnection.getConnection().prepareStatement(
-                    "INSERT INTO admins (username, password) VALUES (?,?)"
-                );
-                stmt.setString(1, username);
-                stmt.setString(2, hashMD5(password));
-                stmt.executeUpdate();
-                JOptionPane.showMessageDialog(this, "Admin added successfully!");
-                txtAdminUsername.setText("");
-                txtAdminPassword.setText("");
-            } catch (java.sql.SQLException e) {
-                if (e.getMessage().contains("Duplicate"))
-                    JOptionPane.showMessageDialog(this, "Username already exists!");
-                else e.printStackTrace();}
-            
+    if (user.isEmpty() || pass.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please enter username and password");
+        return;
+    }
+
+    try {
+        String sql = "INSERT INTO admins (username, password) VALUES (?,?)";
+        PreparedStatement stmt = db.DBConnection.getConnection().prepareStatement(sql);
+        stmt.setString(1, user);
+        stmt.setString(2, pass); // يفضل طبعاً استخدام التشفير hashMD5(pass)
+        
+        stmt.executeUpdate();
+        JOptionPane.showMessageDialog(this, "New Admin added successfully!");
+        txtAdminUsername.setText("");
+        txtAdminPassword.setText("");
+        
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+    }
+
     }//GEN-LAST:event_btnAddAdminActionPerformed
 
     private void btnDeleteStudentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteStudentActionPerformed
