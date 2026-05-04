@@ -390,15 +390,10 @@ public class Student_Dashboard extends javax.swing.JFrame {
 
         jLabel6.setText("Full Name :");
 
-        txtProfileName.setText("jTextField1");
-
         jLabel7.setText("Email :");
-
-        txtProfileEmail.setText("jTextField1");
 
         jLabel8.setText("Phone :");
 
-        txtProfilePhone.setText("jTextField1");
         txtProfilePhone.addActionListener(this::txtProfilePhoneActionPerformed);
 
         btnSaveProfile.setText("Save Changes ");

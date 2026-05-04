@@ -73,11 +73,7 @@ public class LoginForm extends javax.swing.JFrame {
 
         jLabel2.setText("Username / Email :");
 
-        txtUsername.setText("jTextField1");
-
         jLabel3.setText("Password :");
-
-        txtPassword.setText("jPasswordField1");
 
         btnLogin.setText("Login ");
         btnLogin.addActionListener(this::btnLoginActionPerformed);
@@ -150,16 +146,7 @@ public class LoginForm extends javax.swing.JFrame {
 
         jLabel10.setText("Gender :");
 
-        txtFirstName.setText("jTextField1");
         txtFirstName.addActionListener(this::txtFirstNameActionPerformed);
-
-        txtLastName.setText("jTextField2");
-
-        txtAge.setText("jTextField2");
-
-        txtPhone.setText("jTextField2");
-
-        txtAddress.setText("jTextField2");
 
         jLabel5.setText("First Name :");
 
@@ -170,8 +157,6 @@ public class LoginForm extends javax.swing.JFrame {
 
         rbFemale.setText("Female");
         rbFemale.addActionListener(this::rbFemaleActionPerformed);
-
-        txtEmail.setText("jTextField2");
 
         jLabel14.setText("Email :");
 
@@ -244,15 +229,9 @@ public class LoginForm extends javax.swing.JFrame {
 
         jLabel11.setText("User Name :");
 
-        txtRegUsername.setText("jTextField1");
-
         jLabel12.setText("Password :");
 
         jLabel13.setText("Confirm Password :");
-
-        txtRegPassword.setText("jPasswordField1");
-
-        txtConfirmPassword.setText("jPasswordField2");
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
